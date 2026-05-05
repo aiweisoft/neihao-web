@@ -1,0 +1,50 @@
+{
+	"opendb-admin-menus": {
+		"data": [
+			{
+				"menu_id": "medical_device",
+				"name": "医疗设备管理",
+				"icon": "uni-icons-medical",
+				"url": "",
+				"sort": 2200,
+				"parent_id": "",
+				"permission": [],
+				"enable": true,
+				"create_date": 1744646400000
+			},
+			{
+				"menu_id": "medical_device_list",
+				"name": "设备台账",
+				"icon": "uni-icons-list",
+				"url": "/pages/medical-device/list",
+				"sort": 2210,
+				"parent_id": "medical_device",
+				"permission": [],
+				"enable": true,
+				"create_date": 1744646400000
+			},
+			{
+				"menu_id": "medical_device_category",
+				"name": "设备分类",
+				"icon": "uni-icons-category",
+				"url": "/pages/medical-device-category/list",
+				"sort": 2220,
+				"parent_id": "medical_device",
+				"permission": [],
+				"enable": true,
+				"create_date": 1744646400000
+			},
+			{
+				"menu_id": "medical_device_location",
+				"name": "设备位置",
+				"icon": "uni-icons-location",
+				"url": "/pages/medical-device-location/list",
+				"sort": 2230,
+				"parent_id": "medical_device",
+				"permission": [],
+				"enable": true,
+				"create_date": 1744646400000
+			}
+		]
+	}
+}

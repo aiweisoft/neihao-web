@@ -1,0 +1,9 @@
+{
+  "name": "medical-device-import-co",
+  "version": "1.0.0",
+  "description": "医疗设备Excel导入云对象",
+  "dependencies": {
+    "node-xlsx": "^0.21.0"
+  },
+  "extensions": {}
+}
