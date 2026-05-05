@@ -102,11 +102,19 @@
 				</view>
 			</view>
 		</view>
-		<uni-popup ref="errorLogsPopup" type="center">
-			<view class="modal">
-				<scroll-view class="modal-content" scroll-y="true">
-					<error-log class="error-table" />
-				</scroll-view>
+		<uni-popup ref="errorLogsPopup" type="top">
+			<view class="alert-popup-overlay">
+				<view class="alert-modal-box error-log-modal">
+					<view class="alert-modal-header">
+						<text class="alert-modal-title">错误日志</text>
+					</view>
+					<view class="alert-modal-body">
+						<error-log />
+					</view>
+					<view class="alert-modal-footer">
+						<view class="btn-modal-close" @click="closeErrorLogs">关闭</view>
+					</view>
+				</view>
 			</view>
 		</uni-popup>
 		<uni-popup ref="alertPopup" type="top">
@@ -351,6 +359,9 @@
 					this.alertList = []
 				}
 				this.$refs.alertPopup.open()
+			},
+			closeErrorLogs() {
+				this.$refs.errorLogsPopup.close()
 			},
 			closeAlertPopup() {
 				this.$refs.alertPopup.close()
@@ -659,47 +670,6 @@
 		overflow: hidden;
 	}
 
-	.modal {
-		width: 680px;
-		max-width: 90vw;
-		max-height: 75vh;
-		background: #fff;
-		border-radius: 12px;
-		box-sizing: border-box;
-		display: flex;
-		flex-direction: column;
-		overflow: hidden;
-	}
-
-	.modal-header {
-		flex-shrink: 0;
-		padding: 20px 20px 0;
-	}
-
-	.modal-body {
-		flex: 1;
-		min-height: 0;
-		padding: 0 20px;
-		overflow: hidden;
-		display: flex;
-		flex-direction: column;
-	}
-
-	.modal-footer {
-		flex-shrink: 0;
-		padding: 12px 20px 20px;
-	}
-
-	.modal-content {
-		flex: 1;
-		min-height: 0;
-		overflow-y: auto;
-	}
-
-	.error-table {
-		width: 100%;
-	}
-
 	.password-popup {
 		padding: 30px;
 	}
@@ -977,6 +947,15 @@
 		.alert-item-date {
 			font-size: 11px;
 			color: #94a3b8;
+		}
+
+		.error-log-modal {
+			margin-top: 500px;
+			overflow: visible;
+
+			.alert-modal-body {
+				max-height: 30vh;
+			}
 		}
 
 		.btn-modal-close {

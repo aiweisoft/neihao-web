@@ -1,7 +1,7 @@
 {
     "name" : "医疗设备信息管理系统",
     "appid" : "__UNI__6D1FDAD",
-    "description" : "",
+    "description" : "医疗设备全生命周期管理",
     "versionName" : "1.0.0",
     "versionCode" : "100",
     "transformPx" : false,

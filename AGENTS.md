@@ -2,6 +2,22 @@
 
 本文档为在 neihao-web 项目中工作的 AI 编码代理提供项目规范与协作规则。
 
+### ⚠️ 重要：与 device 的关系
+
+本项目和同级目录下的 **`device`** 共同构成一套完整的**医疗设备管理系统**：
+
+| 项目 | 模板 | 定位 | 用户 |
+|------|------|------|------|
+| **neihao-web**（本项目） | uni-admin v2.5.13 | 管理后台 Web 端 | 管理员 |
+| **device** | uni-starter v2.2.15 | 移动端 App（H5/App/小程序） | 普通用户/医护人员 |
+
+**两项目共享同一个 uniCloud 支付宝云环境**（相同的数据库和云函数）。neihao-web 的 `uniCloud-alipay/` 包含全部 158 个数据库 schema（含 7 个医疗设备业务表），device 仅有 93 个基础表。
+
+**开发时注意**：修改数据库 schema 或云函数需两项目同步更新。业务数据互通（如 device 端报修 → neihao-web 端维修处理）。
+
+- **device 位置**：`../device/`
+- **device AGENTS.md** 参见 `../device/AGENTS.md`，包含移动端代码规范、国际化、推送、App 升级等说明
+
 ## 项目概述
 
 neihao-web 是一个基于 **uni-app + uniCloud（支付宝云）** 的后台管理系统（uni-admin v2.5.13 模板），使用 **Vue 2/3 双兼容**（条件编译）、**纯 JavaScript**（无 TypeScript）、**Vuex** 状态管理、**vue-i18n** 国际化、**SCSS** 样式。主要开发工具为 **HBuilderX**。
@@ -172,5 +188,11 @@ type(scope): subject
 类型：`feat` / `fix` / `docs` / `style` / `refactor` / `test` / `chore`
 
 ---
+
+## 补充信息
+
+- **device 位置**：`../device/`
+- **device AGENTS.md**：`../device/AGENTS.md`，包含移动端侧完整代码规范、国际化配置、App 推送、升级中心等
+- **关联业务场景**：device 端用户扫码查看设备、发起报修 → neihao-web 管理员处理维修流程；device 端设备台账数据与 neihao-web 同步
 
 *版本: 2.5.13，基于 uni-admin 模板，为 AI 编码代理优化*

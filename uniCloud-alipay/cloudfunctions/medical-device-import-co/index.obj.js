@@ -273,5 +273,81 @@ module.exports = {
         message: '导入失败: ' + e.message
       }
     }
+  },
+
+  async seedAll() {
+    const db = uniCloud.database()
+    const now = Date.now()
+    const results = {}
+
+    try {
+      const catCount = await db.collection('medical-device-category').count()
+      if (catCount.total === 0) {
+        await db.collection('medical-device-category').add([
+          { code: '01', name: '监护设备', parent_id: '', sort: 10, remark: '生命体征监护类设备' },
+          { code: '02', name: '影像设备', parent_id: '', sort: 20 },
+          { code: '03', name: '检验设备', parent_id: '', sort: 30 },
+          { code: '04', name: '治疗设备', parent_id: '', sort: 40 },
+          { code: '05', name: '诊断设备', parent_id: '', sort: 50 },
+          { code: '0101', name: '多参数监护仪', parent_id: '', sort: 11 },
+          { code: '0201', name: '超声诊断仪', parent_id: '', sort: 21 },
+          { code: '0301', name: '生化分析仪', parent_id: '', sort: 31 },
+          { code: '0202', name: 'X射线设备', parent_id: '', sort: 22 },
+          { code: '0501', name: '心电图机', parent_id: '', sort: 51 }
+        ])
+        results.categories = 'inserted'
+      } else {
+        results.categories = 'already_exists'
+      }
+    } catch (e) { results.categories = e.message }
+
+    try {
+      const locCount = await db.collection('medical-device-location').count()
+      if (locCount.total === 0) {
+        await db.collection('medical-device-location').add([
+          { code: 'ICU-01', name: 'ICU监护室1号位', building: '住院部', floor: '3楼', room: '301' },
+          { code: 'ER-01', name: '急诊科超声室', building: '急诊楼', floor: '1楼', room: '105' },
+          { code: 'LAB-01', name: '检验科生化室', building: '医技楼', floor: '2楼', room: '208' },
+          { code: 'RAD-01', name: '放射科DR室', building: '医技楼', floor: '1楼', room: '101' },
+          { code: 'CARD-01', name: '心内科心电图室', building: '门诊楼', floor: '2楼', room: '210' }
+        ])
+        results.locations = 'inserted'
+      } else {
+        results.locations = 'already_exists'
+      }
+    } catch (e) { results.locations = e.message }
+
+    try {
+      const devCount = await db.collection('medical-device').where({ deleted: 0 }).count()
+      if (devCount.total === 0) {
+        await db.collection('medical-device').add([
+          { code: 'MED-20230001', name: '多参数监护仪', brand: '迈瑞', model: 'BeneVision N22', status: 1, management_type: 2, deleted: 0, created_at: now, updated_at: now },
+          { code: 'MED-20230002', name: '便携式超声诊断仪', brand: 'GE', model: 'Vivid iq', status: 2, management_type: 2, deleted: 0, created_at: now, updated_at: now },
+          { code: 'MED-20230003', name: '全自动生化分析仪', brand: '罗氏', model: 'Cobas c702', status: 1, management_type: 1, deleted: 0, created_at: now, updated_at: now },
+          { code: 'MED-20230004', name: '数字化X射线摄影系统', brand: '西门子', model: 'Ysio Max', status: 3, management_type: 2, deleted: 0, created_at: now, updated_at: now },
+          { code: 'MED-20220001', name: '心电图机', brand: '福田', model: 'FX-7402', status: 4, management_type: 1, deleted: 0, created_at: now, updated_at: now }
+        ])
+        results.devices = 'inserted'
+      } else {
+        results.devices = 'already_exists'
+      }
+    } catch (e) { results.devices = e.message }
+
+    try {
+      const alertCount = await db.collection('medical-device-alert').count()
+      if (alertCount.total === 0) {
+        await db.collection('medical-device-alert').add([
+          { title: '多参数监护仪保养到期', description: '设备 MED-20230001 距离上次保养已超6个月', alert_type: 1, is_read: 0, alert_date: now - 86400000 },
+          { title: 'DR设备维修进度更新', description: '数字化X射线摄影系统维修已完成，请验收', alert_type: 2, is_read: 0, alert_date: now - 172800000 },
+          { title: '生化分析仪校准提醒', description: '全自动生化分析仪校准证书将于15天后到期', alert_type: 2, is_read: 0, alert_date: now - 259200000 },
+          { title: '心电图机报废确认', description: '心电图机 MED-20220001 已标记报废', alert_type: 4, is_read: 0, alert_date: now - 345600000 }
+        ])
+        results.alerts = 'inserted'
+      } else {
+        results.alerts = 'already_exists'
+      }
+    } catch (e) { results.alerts = e.message }
+
+    return { code: 0, data: results }
   }
 }

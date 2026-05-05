@@ -1,6 +1,5 @@
 <template>
-    <view class="uni-table">
-        <uni-table border stripe>
+    <uni-table border stripe>
             <uni-tr>
                 <uni-th align="center">错误信息</uni-th>
                 <uni-th width="100" align="center">路由</uni-th>
@@ -25,7 +24,6 @@
                 </uni-td>
             </uni-tr>
         </uni-table>
-    </view>
 </template>
 
 <script>
