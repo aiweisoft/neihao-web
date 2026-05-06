@@ -82,7 +82,7 @@ export default {
   data() {
     let formData = {
       "device_id": "",
-      "request_date": null,
+      "request_date": Date.now(),
       "requester": "",
       "phone": "",
       "fault_description": "",

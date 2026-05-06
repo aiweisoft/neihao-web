@@ -20,7 +20,10 @@
 		},
 		"request_date": {
 			"bsonType": "timestamp",
-			"description": "报修日期"
+			"description": "报修日期",
+			"forceDefaultValue": {
+				"$env": "now"
+			}
 		},
 		"requester": {
 			"bsonType": "string",
