@@ -125,6 +125,14 @@
 			"bsonType": "int",
 			"description": "使用年限"
 		},
+		"acceptance_date": {
+			"bsonType": "timestamp",
+			"description": "验收日期"
+		},
+		"warranty_years": {
+			"bsonType": "int",
+			"description": "保修年限（年）"
+		},
 		"remark": {
 			"bsonType": "string",
 			"description": "备注"

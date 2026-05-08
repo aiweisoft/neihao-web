@@ -137,6 +137,8 @@ const HEADER_LABEL_MAP = {
   '适用范围': 'applicable_scope',
   '生产日期': 'manufacture_date',
   '使用年限': 'service_life',
+  '验收日期': 'acceptance_date',
+  '保修年限': 'warranty_years',
   '备注': 'remark'
 }
 
@@ -264,7 +266,7 @@ export default {
       if (!field) return ''
       const val = record[field]
       if (val === null || val === undefined) return '-'
-      if (field === 'purchase_date' || field === 'warranty_end' || field === 'manufacture_date') {
+      if (field === 'purchase_date' || field === 'warranty_end' || field === 'manufacture_date' || field === 'acceptance_date') {
         if (typeof val === 'number') {
           return this.formatDate(val)
         }
@@ -290,7 +292,7 @@ export default {
       let csv = '\uFEFF' + headers.join(',') + '\n'
       csv += ['DEV-001', '示例设备A', '设备A', '示例品牌', 'XH-100', '国械注准20250001', 'SN-001', '示例厂家',
         '请填写分类名称', '请填写部门名称', '请填写位置名称', '', '10000', '示例供应商', '', '正常',
-        '张三', '一类', '适用范围示例', '', '5', ''
+        '张三', '一类', '适用范围示例', '', '5', '', '', '', ''
       ].join(',') + '\n'
 
       const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' })

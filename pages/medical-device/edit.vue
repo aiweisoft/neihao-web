@@ -114,6 +114,18 @@
               </uni-forms-item>
             </view>
           </view>
+          <view class="form-row">
+            <view class="form-col">
+              <uni-forms-item label="验收日期" name="acceptance_date">
+                <uni-datetime-picker type="date" return-type="timestamp" v-model="formData.acceptance_date" placeholder="请选择验收日期" />
+              </uni-forms-item>
+            </view>
+            <view class="form-col">
+              <uni-forms-item label="保修年限" name="warranty_years">
+                <uni-easyinput v-model="formData.warranty_years" type="digit" placeholder="请输入保修年限（年）" />
+              </uni-forms-item>
+            </view>
+          </view>
           <uni-forms-item label="设备照片" name="image_url">
             <uni-file-picker v-model="formData.image_url" fileMediatype="image" mode="grid" :image-styles="imageStyles" />
           </uni-forms-item>
@@ -165,6 +177,8 @@ export default {
       "applicable_scope": "",
       "manufacture_date": null,
       "service_life": null,
+      "acceptance_date": null,
+      "warranty_years": null,
       "purchase_date": null,
       "purchase_amount": null,
       "supplier": "",
@@ -239,10 +253,13 @@ export default {
     },
     getDetail(id) {
       uni.showLoading({ mask: true })
-      db.collection(dbCollectionName).doc(id).field("code,name,short_name,manufacturer,brand,model,spec,serial_no,category_id,dept_id,location_id,person_in_charge,management_type,applicable_scope,manufacture_date,service_life,purchase_date,purchase_amount,supplier,warranty_end,status,image_url,remark").get().then((res) => {
+              db.collection(dbCollectionName).doc(id).field("code,name,short_name,manufacturer,brand,model,spec,serial_no,category_id,dept_id,location_id,person_in_charge,management_type,applicable_scope,manufacture_date,service_life,acceptance_date,warranty_years,purchase_date,purchase_amount,supplier,warranty_end,status,image_url,remark").get().then((res) => {
         const data = res.result.data[0]
         if (data) {
           this.formData = data
+          if (this.formData.acceptance_date) {
+            this.formData.acceptance_date = new Date(this.formData.acceptance_date).getTime()
+          }
           if (this.formData.purchase_date) {
             this.formData.purchase_date = new Date(this.formData.purchase_date).getTime()
           }

@@ -114,6 +114,18 @@
               </uni-forms-item>
             </view>
           </view>
+          <view class="form-row">
+            <view class="form-col">
+              <uni-forms-item label="验收日期" name="acceptance_date">
+                <uni-datetime-picker type="date" return-type="timestamp" v-model="formData.acceptance_date" placeholder="请选择验收日期" />
+              </uni-forms-item>
+            </view>
+            <view class="form-col">
+              <uni-forms-item label="保修年限" name="warranty_years">
+                <uni-easyinput v-model="formData.warranty_years" type="digit" placeholder="请输入保修年限（年）" />
+              </uni-forms-item>
+            </view>
+          </view>
           <uni-forms-item label="设备照片" name="image_url">
             <uni-file-picker v-model="formData.image_url" fileMediatype="image" mode="grid" :image-styles="imageStyles" />
           </uni-forms-item>
@@ -165,6 +177,8 @@ export default {
       "applicable_scope": "",
       "manufacture_date": null,
       "service_life": null,
+      "acceptance_date": null,
+      "warranty_years": null,
       "purchase_date": null,
       "purchase_amount": null,
       "supplier": "",

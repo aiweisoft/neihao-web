@@ -22,6 +22,8 @@ const FIELD_MAP = {
   '适用范围': 'applicable_scope',
   '生产日期': 'manufacture_date',
   '使用年限': 'service_life',
+  '验收日期': 'acceptance_date',
+  '保修年限': 'warranty_years',
   '备注': 'remark'
 }
 
@@ -212,6 +214,8 @@ module.exports = {
       if (record.manufacture_date) record.manufacture_date = formatExcelDate(record.manufacture_date)
       if (record.purchase_amount) record.purchase_amount = Number(record.purchase_amount) || 0
       if (record.service_life) record.service_life = Number(record.service_life) || 0
+      if (record.warranty_years) record.warranty_years = Number(record.warranty_years) || 0
+      if (record.acceptance_date) record.acceptance_date = formatExcelDate(record.acceptance_date)
 
       String(record.code) && (record.code = String(record.code).trim())
       String(record.name) && (record.name = String(record.name).trim())

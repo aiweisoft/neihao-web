@@ -48,12 +48,13 @@
               <uni-th align="center">设备名称</uni-th>
               <uni-th align="center">品牌</uni-th>
               <uni-th align="center">规格型号</uni-th>
-              <uni-th align="center">设备分类</uni-th>
               <uni-th align="center">使用部门</uni-th>
               <uni-th align="center">设备管理类型</uni-th>
               <uni-th align="center">状态</uni-th>
               <uni-th align="center">生产日期</uni-th>
               <uni-th align="center">使用年限</uni-th>
+              <uni-th align="center">验收日期</uni-th>
+              <uni-th align="center">保修年限</uni-th>
               <uni-th align="center">操作</uni-th>
             </uni-tr>
             <uni-tr v-for="(item, index) in tableData" :key="index">
@@ -68,10 +69,6 @@
               </uni-td>
               <uni-td align="center">{{ item.brand }}</uni-td>
               <uni-td align="center">{{ item.model }}</uni-td>
-              <uni-td align="center">
-                <uni-tag v-if="item.category_id_text" :text="item.category_id_text" type="primary" inverted size="small" />
-                <text v-else class="cell-empty">-</text>
-              </uni-td>
               <uni-td align="center">{{ item.dept_id_text || '-' }}</uni-td>
               <uni-td align="center">
                 <uni-tag :text="getManagementTypeText(item.management_type)" :type="getManagementTypeType(item.management_type)" size="small" />
@@ -81,6 +78,8 @@
               </uni-td>
               <uni-td align="center">{{ item.manufacture_date || '-' }}</uni-td>
               <uni-td align="center">{{ item.service_life ? item.service_life + '年' : '-' }}</uni-td>
+              <uni-td align="center">{{ item.acceptance_date || '-' }}</uni-td>
+              <uni-td align="center">{{ item.warranty_years ? item.warranty_years + '年' : '-' }}</uni-td>
               <uni-td align="center">
                 <view class="action-group">
                   <button @click="navigateTo('./edit?id=' + item._id, false)" class="btn-action btn-action-edit" size="mini">编辑</button>
@@ -140,7 +139,6 @@ export default {
           '品牌': 'brand',
           '规格型号': 'model',
           '厂家': 'manufacturer',
-          '设备分类': 'category_id_text',
           '使用部门': 'dept_id_text',
           '存放位置': 'location_id_text',
           '设备管理类型': 'management_type_text',
@@ -153,8 +151,10 @@ export default {
           '供应商': 'supplier',
           '保修截止': 'warranty_end',
           '设备适用范围': 'applicable_scope',
-           '生产日期': 'manufacture_date',
-           '使用年限': 'service_life',
+          '生产日期': 'manufacture_date',
+          '使用年限': 'service_life',
+          '验收日期': 'acceptance_date',
+          '保修年限': 'warranty_years',
           '备注': 'remark'
         }
       },
@@ -170,22 +170,13 @@ export default {
       this.selectedIndexs = []
       this.tableData = []
       if (data && data.length) {
-        const categoryIds = [...new Set(data.map(item => item.category_id).filter(Boolean))]
         const deptIds = [...new Set(data.map(item => item.dept_id).filter(Boolean))]
         const locationIds = [...new Set(data.map(item => item.location_id).filter(Boolean))]
 
         const promises = []
-        let categoryMap = {}
         let deptMap = {}
         let locationMap = {}
 
-        if (categoryIds.length) {
-          promises.push(
-            db.collection('medical-device-category').where({ _id: dbCmd.in(categoryIds) }).get().then(res => {
-              categoryMap = Object.fromEntries((res.result.data || []).map(item => [item._id, item.name]))
-            })
-          )
-        }
         if (deptIds.length) {
           promises.push(
             db.collection('opendb-department').where({ _id: dbCmd.in(deptIds) }).get().then(res => {
@@ -205,10 +196,10 @@ export default {
 
         this.tableData = data.map(item => ({
           ...item,
-          category_id_text: categoryMap[item.category_id] || '',
           dept_id_text: deptMap[item.dept_id] || '',
           location_id_text: locationMap[item.location_id] || '',
-          manufacture_date: item.manufacture_date ? this.formatDate(item.manufacture_date) : '-'
+          manufacture_date: item.manufacture_date ? this.formatDate(item.manufacture_date) : '-',
+          acceptance_date: item.acceptance_date ? this.formatDate(item.acceptance_date) : '-'
         }))
 
         this.exportExcelData = this.tableData.map(item => ({
@@ -217,7 +208,8 @@ export default {
           status_text: this.getStatusText(item.status),
           purchase_date: item.purchase_date ? this.formatDate(item.purchase_date) : '',
           warranty_end: item.warranty_end ? this.formatDate(item.warranty_end) : '',
-          manufacture_date: item.manufacture_date ? this.formatDate(item.manufacture_date) : ''
+          manufacture_date: item.manufacture_date ? this.formatDate(item.manufacture_date) : '',
+          acceptance_date: item.acceptance_date ? this.formatDate(item.acceptance_date) : ''
         }))
       }
     },

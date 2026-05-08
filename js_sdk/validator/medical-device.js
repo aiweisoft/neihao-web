@@ -220,6 +220,20 @@ const validator = {
       }
     ]
   },
+  "acceptance_date": {
+    "rules": [
+      {
+        "format": "timestamp"
+      }
+    ]
+  },
+  "warranty_years": {
+    "rules": [
+      {
+        "format": "int"
+      }
+    ]
+  },
   "image_url": {
     "rules": [
       {
