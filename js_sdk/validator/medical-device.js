@@ -237,7 +237,7 @@ const validator = {
   "image_url": {
     "rules": [
       {
-        "format": "string"
+        "format": "array"
       }
     ]
   },

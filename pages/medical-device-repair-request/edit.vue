@@ -160,26 +160,49 @@ export default {
         uni.hideLoading()
       })
     },
-    submitForm(value) {
-      return db.collection(dbCollectionName).doc(this.formDataId).update({
-        ...value,
-        updated_at: Date.now()
-      }).then((res) => {
+    async submitForm(value) {
+      try {
+        const oldData = this.formData
+        await db.collection(dbCollectionName).doc(this.formDataId).update({
+          ...value,
+          updated_at: Date.now()
+        })
+        let promises = []
+        if (value.status === 3 && oldData.status !== 3) {
+          promises.push(
+            db.collection('medical-device').doc(value.device_id).update({
+              status: 2,
+              updated_at: Date.now()
+            })
+          )
+        }
+        await Promise.all(promises)
         uni.showToast({ title: '修改成功' })
         this.getOpenerEventChannel().emit('refreshData')
         setTimeout(() => uni.navigateBack(), 500)
-      }).catch((err) => {
+      } catch (err) {
         uni.showModal({ content: err.message || '请求服务失败', showCancel: false })
-      })
+      }
     },
     getDetail(id) {
       uni.showLoading({ mask: true })
-      db.collection(dbCollectionName).doc(id).field("device_id,request_date,requester,phone,fault_description,urgency,status,handler,handle_date,handle_result,remark").get().then((res) => {
+      db.collection(dbCollectionName).doc(id).field("device_id,request_date,requester,phone,fault_description,urgency,status,handler,handle_date,handle_result,remark").get().then(async (res) => {
         const data = res.result.data[0]
         if (data) {
           this.formData = Object.assign(this.formData, data)
-          const text = Object.keys(this.deviceOptionMap).find(k => this.deviceOptionMap[k] === data.device_id)
-          if (text) this.deviceText = text
+          const matched = Object.keys(this.deviceOptionMap).find(k => this.deviceOptionMap[k] === data.device_id)
+          if (matched) {
+            this.deviceText = matched
+          } else {
+            const deviceRes = await db.collection('medical-device').doc(data.device_id).field('name,code').get()
+            const device = deviceRes.result.data[0]
+            if (device) {
+              const text = device.name + ' (' + device.code + ')'
+              this.deviceOptionMap[text] = device._id
+              this.deviceCandidates.push(text)
+              this.$nextTick(() => { this.deviceText = text })
+            }
+          }
         }
       }).catch((err) => {
         uni.showModal({ content: err.message || '请求服务失败', showCancel: false })
@@ -188,9 +211,16 @@ export default {
       })
     },
     async loadDevices() {
-      const res = await db.collection('medical-device').where({ deleted: 0, status: db.command.neq(3) }).get()
+      const condition = { deleted: 0, status: 2 }
+      const res = await db.collection('medical-device').where(condition).limit(1000).get()
       const map = {}
-      const candidates = res.result.data.map(d => {
+      const dataList = [...res.result.data]
+      if (this.formData.device_id && !dataList.some(d => d._id === this.formData.device_id)) {
+        const deviceRes = await db.collection('medical-device').doc(this.formData.device_id).field('name,code').get()
+        const device = deviceRes.result.data[0]
+        if (device) dataList.push(device)
+      }
+      const candidates = dataList.map(d => {
         const text = d.name + ' (' + d.code + ')'
         map[text] = d._id
         return text

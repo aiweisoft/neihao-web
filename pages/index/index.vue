@@ -318,6 +318,12 @@ export default {
     this.setGreeting()
     this.loadAll()
   },
+  onShow() {
+    this.loadStatusSummary()
+    this.loadDeviceCount()
+    this.loadAlertCount()
+    this.loadAlertList()
+  },
   onUnload() {
     clearInterval(this.timer)
   },

@@ -42,7 +42,6 @@
               </uni-td>
               <uni-td align="center">
                 <view class="action-group">
-                  <button v-if="item.status === 1 || item.status === 2" @click="goRepair(item)" class="btn-action btn-action-repair" size="mini">去维修</button>
                   <button @click="navigateTo('./edit?id=' + item._id, false)" class="btn-action btn-action-edit" size="mini">编辑</button>
                   <button @click="confirmDelete(item._id)" class="btn-action btn-action-delete" size="mini">删除</button>
                 </view>
@@ -130,17 +129,42 @@ export default {
     statusTag(val) {
       return { 1: 'warning', 2: 'primary', 3: 'success', 4: 'info' }[val] || 'default'
     },
-    delTable() {
+    async delTable() {
       const ids = this.selectedItems()
+      const repairRes = await db.collection('medical-device-repair').where({
+        repair_request_id: dbCmd.in(ids),
+        deleted: 0
+      }).get()
+      if (repairRes.result.data.length > 0) {
+        uni.showModal({
+          title: '无法删除',
+          content: '选中报修单存在关联的维修记录，请先删除维修记录后再删除报修单',
+          showCancel: false
+        })
+        return
+      }
+      const itemsRes = await db.collection(dbCollectionName).where({ _id: dbCmd.in(ids) }).get()
+      const deviceIds = [...new Set(itemsRes.result.data.map(i => i.device_id).filter(Boolean))]
       uni.showModal({
         title: '提示',
         content: `确定删除选中的 ${ids.length} 条记录吗？`,
         success: (res) => {
           if (res.confirm) {
-            db.collection(dbCollectionName).where({ _id: dbCmd.in(ids) }).update({
-              deleted: 1,
-              updated_at: Date.now()
-            }).then(() => {
+            const promises = [
+              db.collection(dbCollectionName).where({ _id: dbCmd.in(ids) }).update({
+                deleted: 1,
+                updated_at: Date.now()
+              })
+            ]
+            if (deviceIds.length) {
+              promises.push(
+                db.collection('medical-device').where({ _id: dbCmd.in(deviceIds) }).update({
+                  status: 2,
+                  updated_at: Date.now()
+                })
+              )
+            }
+            Promise.all(promises).then(() => {
               uni.showToast({ title: '删除成功', icon: 'success' })
               this.selectedIndexs = []
               this.loadData()
@@ -149,24 +173,41 @@ export default {
         }
       })
     },
-    goRepair(item) {
-      uni.navigateTo({
-        url: '/pages/medical-device-repair/add?device_id=' + item.device_id + '&fault_description=' + encodeURIComponent(item.fault_description) + '&repair_request_id=' + item._id,
-        events: {
-          refreshData: () => this.loadData()
-        }
-      })
-    },
-    confirmDelete(id) {
+    async confirmDelete(id) {
+      const repairRes = await db.collection('medical-device-repair').where({
+        repair_request_id: id,
+        deleted: 0
+      }).get()
+      if (repairRes.result.data.length > 0) {
+        uni.showModal({
+          title: '无法删除',
+          content: '该报修单存在关联的维修记录，请先删除维修记录后再删除',
+          showCancel: false
+        })
+        return
+      }
+      const itemRes = await db.collection(dbCollectionName).doc(id).get()
+      const deviceId = itemRes.result.data[0]?.device_id
       uni.showModal({
         title: '提示',
         content: '确定删除该记录吗？',
         success: (res) => {
           if (res.confirm) {
-            db.collection(dbCollectionName).doc(id).update({
-              deleted: 1,
-              updated_at: Date.now()
-            }).then(() => {
+            const promises = [
+              db.collection(dbCollectionName).doc(id).update({
+                deleted: 1,
+                updated_at: Date.now()
+              })
+            ]
+            if (deviceId) {
+              promises.push(
+                db.collection('medical-device').doc(deviceId).update({
+                  status: 2,
+                  updated_at: Date.now()
+                })
+              )
+            }
+            Promise.all(promises).then(() => {
               uni.showToast({ title: '删除成功', icon: 'success' })
               this.loadData()
             })
@@ -197,7 +238,6 @@ $border: #e2e8f0;
 .page-body { padding: 0; }
 .action-group { display: flex; gap: 6px; justify-content: center; }
 .btn-action { padding: 4px 12px; border-radius: 6px; font-size: 12px; font-weight: 500; line-height: 2; transition: all 0.15s ease; }
-.btn-action-repair { background: #ecfdf5; border: none; color: #10b981; &:hover { background: darken(#ecfdf5, 5%); transform: translateY(-1px); } }
 .btn-action-edit { background: #eef2ff; border: none; color: $primary; &:hover { background: darken(#eef2ff, 5%); transform: translateY(-1px); } }
 .btn-action-delete { background: $danger-light; border: none; color: $danger; &:hover { background: darken($danger-light, 5%); transform: translateY(-1px); } }
 .pagination-box { display: flex; justify-content: center; padding: 16px 24px; border-top: 1px solid $border; }

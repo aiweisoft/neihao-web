@@ -120,11 +120,8 @@ export default {
     },
     async submitForm(value) {
       try {
-        const deviceRes = await db.collection('medical-device').doc(value.device_id).field('status').get()
-        const currentStatus = deviceRes.result.data[0]?.status || 1
         await db.collection(dbCollectionName).add({ ...value, deleted: 0 })
         await db.collection('medical-device').doc(value.device_id).update({
-          previous_status: currentStatus,
           status: 3,
           updated_at: Date.now()
         })
@@ -136,7 +133,8 @@ export default {
       }
     },
     async loadDevices() {
-      const res = await db.collection('medical-device').where({ deleted: 0, status: db.command.neq(3) }).get()
+      const condition = { deleted: 0, status: 2 }
+      const res = await db.collection('medical-device').where(condition).limit(1000).get()
       const map = {}
       const candidates = res.result.data.map(d => {
         const text = d.name + ' (' + d.code + ')'

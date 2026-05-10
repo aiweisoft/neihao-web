@@ -259,8 +259,23 @@ export default {
     selectedItems() {
       return this.selectedIndexs.map(i => this.tableData[i]._id)
     },
-    delTable() {
+    async delTable() {
       const ids = this.selectedItems()
+      const repairRes = await db.collection('medical-device-repair-request').where({
+        device_id: dbCmd.in(ids),
+        deleted: 0
+      }).get()
+      const repairDeviceIds = [...new Set(repairRes.result.data.map(r => r.device_id).filter(Boolean))]
+      if (repairDeviceIds.length > 0) {
+        const deviceRes = await db.collection('medical-device').where({ _id: dbCmd.in(repairDeviceIds) }).get()
+        const names = deviceRes.result.data.map(d => d.name).join('、')
+        uni.showModal({
+          title: '无法删除',
+          content: `设备「${names}」存在报修记录，请先删除报修记录后再删除设备`,
+          showCancel: false
+        })
+        return
+      }
       uni.showModal({
         title: '提示',
         content: `确定删除选中的 ${ids.length} 条记录吗？`,

@@ -90,9 +90,10 @@
 			"defaultValue": 1,
 			"enum": [1, 2, 3, 4, 5, 6]
 		},
+
 		"image_url": {
 			"bsonType": "string",
-			"description": "设备照片URL",
+			"description": "设备照片URL（JSON数组字符串）",
 			"trim": "both"
 		},
 		"qr_code": {

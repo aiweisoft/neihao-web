@@ -11,27 +11,34 @@
         <uni-forms ref="form" :model="formData" label-width="100px" label-align="right">
           <view class="form-row">
             <view class="form-col">
-              <uni-forms-item label="关联报修" required name="repair_request_id">
-                <uni-combox v-model="repairRequestText" :candidates="repairRequestCandidates" placeholder="请选择关联报修单" @input="onRepairRequestInput" />
-              </uni-forms-item>
-            </view>
-            <view class="form-col">
-              <uni-forms-item label="维修日期" required name="repair_date">
-                <uni-datetime-picker v-model="formData.repair_date" return-type="timestamp" placeholder="请选择维修日期" />
+              <uni-forms-item label="关联报修">
+                <view class="device-display">{{ repairRequestText }}</view>
               </uni-forms-item>
             </view>
           </view>
           <view class="form-row">
             <view class="form-col">
-              <uni-forms-item v-if="formData.device_id" label="关联设备">
+              <uni-forms-item label="关联设备" v-if="formData.device_id">
                 <view class="device-display">{{ deviceDisplay }}</view>
               </uni-forms-item>
             </view>
           </view>
           <view class="form-row">
             <view class="form-col">
-              <uni-forms-item label="故障描述" required name="fault_description">
-                <uni-easyinput v-model="formData.fault_description" type="textarea" placeholder="请输入故障描述" trim="both" />
+              <uni-forms-item label="故障描述">
+                <view class="device-display">{{ formData.fault_description }}</view>
+              </uni-forms-item>
+            </view>
+          </view>
+          <view class="form-row">
+            <view class="form-col">
+              <uni-forms-item label="维修结果" name="result">
+                <uni-data-select v-model="formData.result" :localdata="resultOptions" placeholder="请选择维修结果" />
+              </uni-forms-item>
+            </view>
+            <view class="form-col">
+              <uni-forms-item label="维修日期" required name="repair_date">
+                <uni-datetime-picker v-model="formData.repair_date" return-type="timestamp" placeholder="请选择维修日期" />
               </uni-forms-item>
             </view>
           </view>
@@ -56,18 +63,6 @@
             <view class="form-col">
               <uni-forms-item label="维修公司" name="repair_company">
                 <uni-easyinput v-model="formData.repair_company" placeholder="请输入维修公司" trim="both" />
-              </uni-forms-item>
-            </view>
-          </view>
-          <view class="form-row">
-            <view class="form-col">
-              <uni-forms-item label="维修人员" name="repair_person">
-                <uni-easyinput v-model="formData.repair_person" placeholder="请输入维修人员" trim="both" />
-              </uni-forms-item>
-            </view>
-            <view class="form-col">
-              <uni-forms-item label="维修结果" name="result">
-                <uni-data-select v-model="formData.result" :localdata="resultOptions" placeholder="请选择维修结果" />
               </uni-forms-item>
             </view>
           </view>
@@ -109,7 +104,7 @@ export default {
   data() {
     let formData = {
       "device_id": "",
-      "repair_date": null,
+      "repair_date": Date.now(),
       "fault_description": "",
       "fault_reason": "",
       "repair_method": "",
@@ -168,25 +163,25 @@ export default {
       })
     },
     submitForm(value) {
-      return db.collection(dbCollectionName).doc(this.formDataId).update({
+      const updateData = {
         ...value,
+        device_id: this.formData.device_id,
+        repair_request_id: this.formData.repair_request_id,
+        fault_description: this.formData.fault_description,
         updated_at: Date.now()
-      }).then((res) => {
+      }
+      return db.collection(dbCollectionName).doc(this.formDataId).update(updateData).then((res) => {
         let promises = []
         if (value.result === 1) {
           promises.push(
-            db.collection('medical-device').doc(value.device_id).field('previous_status').get().then(deviceRes => {
-              const prevStatus = deviceRes.result.data[0]?.previous_status || 2
-              return db.collection('medical-device').doc(value.device_id).update({
-                status: prevStatus,
-                previous_status: null,
-                updated_at: Date.now()
-              })
+            db.collection('medical-device').doc(this.formData.device_id).update({
+              status: 2,
+              updated_at: Date.now()
             })
           )
         }
-        if (value.repair_request_id) {
-          promises.push(db.collection('medical-device-repair-request').doc(value.repair_request_id).update({
+        if (this.formData.repair_request_id) {
+          promises.push(db.collection('medical-device-repair-request').doc(this.formData.repair_request_id).update({
             status: value.result === 1 ? 3 : 2,
             updated_at: Date.now()
           }))

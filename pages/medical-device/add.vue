@@ -127,7 +127,7 @@
             </view>
           </view>
           <uni-forms-item label="设备照片" name="image_url">
-            <uni-file-picker v-model="formData.image_url" fileMediatype="image" mode="grid" :image-styles="imageStyles" />
+            <uni-file-picker v-model="formData.image_url" fileMediatype="image" mode="grid" :image-styles="imageStyles" :limit="2" @success="onFileChange" @delete="onFileChange" />
           </uni-forms-item>
           <uni-forms-item label="备注" name="remark">
             <uni-easyinput type="textarea" v-model="formData.remark" placeholder="请输入备注" />
@@ -212,7 +212,7 @@ export default {
         border: { color: '#eee', width: 1, style: 'solid', radius: '4px' }
       },
       rules: {
-        ...getValidator(Object.keys(formData))
+        ...getValidator(Object.keys(formData).filter(key => key !== 'image_url'))
       }
     }
   },
@@ -233,10 +233,11 @@ export default {
       })
     },
     submitForm(value) {
-      return db.collection(dbCollectionName).add({
-        ...value,
-        deleted: 0
-      }).then((res) => {
+      const data = { ...value, deleted: 0 }
+      if (Array.isArray(this.formData.image_url)) {
+        data.image_url = this.formData.image_url.map(item => typeof item === 'string' ? item : item.url).filter(Boolean)
+      }
+      return db.collection(dbCollectionName).add(data).then((res) => {
         uni.showToast({ title: '新增成功' })
         this.getOpenerEventChannel().emit('refreshData')
         setTimeout(() => uni.navigateBack(), 500)
