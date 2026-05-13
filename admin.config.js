@@ -41,64 +41,6 @@ export default {
 	sideBar: { // 左侧菜单
 		// 配置静态菜单列表（放置在用户被授权的菜单列表下边）
 		staticMenu: [{
-			menu_id: "medical-device",
-			text: '医疗设备管理',
-			icon: 'admin-icons-shebeitongji',
-			url: "",
-			children: [{
-				menu_id: "device-list",
-				text: '设备台账',
-				icon: 'admin-icons-table',
-				value: '/pages/medical-device/list',
-			}, {
-				menu_id: "device-category",
-				text: '设备分类',
-				icon: 'admin-icons-manager-tag',
-				value: '/pages/medical-device-category/list',
-			}, {
-				menu_id: "device-location",
-				text: '存放位置',
-				icon: 'admin-icons-ziyuan',
-				value: '/pages/medical-device-location/list',
-			}, {
-				menu_id: "department",
-				text: '使用部门',
-				icon: 'admin-icons-manager-user',
-				value: '/pages/opendb-department/list',
-			}]
-		}, {
-			menu_id: "device-repair-root",
-			text: '维修管理',
-			icon: 'admin-icons-cuowutongji',
-			url: "",
-    children: [{
-      menu_id: "device-repair-request",
-      text: '设备报修',
-      icon: 'admin-icons-cuowutongji',
-      value: '/pages/medical-device-repair-request/list',
-    }, {
-      menu_id: "device-repair",
-      text: '维修记录',
-      icon: 'admin-icons-error-js',
-      value: '/pages/medical-device-repair/list',
-    }]
-		}, {
-			menu_id: "device-maintenance-root",
-			text: '保养管理',
-			icon: 'admin-icons-dashboard',
-			url: "",
-			children: [{
-				menu_id: "device-maintenance",
-				text: '保养计划',
-				icon: 'admin-icons-tongji',
-				value: '/pages/medical-device-maintenance/list',
-			}, {
-				menu_id: "device-alert",
-				text: '报警提醒',
-				icon: 'admin-icons-safety',
-				value: '/pages/medical-device-alert/list',
-			}]
-		}, {
 			menu_id: "system-root",
 			text: '系统管理',
 			icon: 'admin-icons-xitongguanli',
