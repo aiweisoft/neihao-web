@@ -46,6 +46,7 @@
             <uni-tr>
               <uni-th align="center" width="150">设备编号</uni-th>
               <uni-th align="center">设备名称</uni-th>
+              <uni-th align="center">设备照片</uni-th>
               <uni-th align="center">品牌</uni-th>
               <uni-th align="center">规格型号</uni-th>
               <uni-th align="center">使用部门</uni-th>
@@ -53,8 +54,6 @@
               <uni-th align="center">状态</uni-th>
               <uni-th align="center">生产日期</uni-th>
               <uni-th align="center">使用年限</uni-th>
-              <uni-th align="center">验收日期</uni-th>
-              <uni-th align="center">保修年限</uni-th>
               <uni-th align="center">操作</uni-th>
             </uni-tr>
             <uni-tr v-for="(item, index) in tableData" :key="index">
@@ -67,6 +66,12 @@
                   <text v-if="item.short_name" class="short-name">({{ item.short_name }})</text>
                 </view>
               </uni-td>
+              <uni-td align="center">
+                <view v-if="item.image_url && item.image_url.length" class="photo-cell">
+                  <image class="photo-thumb" :src="getFirstImage(item.image_url)" mode="aspectFill" @click="previewImage(item.image_url, 0)" />
+                </view>
+                <text v-else class="cell-empty">无照片</text>
+              </uni-td>
               <uni-td align="center">{{ item.brand }}</uni-td>
               <uni-td align="center">{{ item.model }}</uni-td>
               <uni-td align="center">{{ item.dept_id_text || '-' }}</uni-td>
@@ -78,10 +83,9 @@
               </uni-td>
               <uni-td align="center">{{ item.manufacture_date || '-' }}</uni-td>
               <uni-td align="center">{{ item.service_life ? item.service_life + '年' : '-' }}</uni-td>
-              <uni-td align="center">{{ item.acceptance_date || '-' }}</uni-td>
-              <uni-td align="center">{{ item.warranty_years ? item.warranty_years + '年' : '-' }}</uni-td>
               <uni-td align="center">
                 <view class="action-group">
+                  <button @click="showDetail(item._id)" class="btn-action btn-action-view" size="mini">查看</button>
                   <button @click="navigateTo('./edit?id=' + item._id, false)" class="btn-action btn-action-edit" size="mini">编辑</button>
                   <button @click="confirmDelete(item._id)" class="btn-action btn-action-delete" size="mini">删除</button>
                 </view>
@@ -95,6 +99,113 @@
         </unicloud-db>
       </view>
     </view>
+
+    <uni-popup ref="detailPopup" type="center" background-color="#fff">
+      <view class="detail-popup" v-if="detailData">
+        <view class="detail-header">
+          <text class="detail-title">设备详情</text>
+          <uni-icons type="closeempty" size="20" color="#64748b" @click="closeDetail"></uni-icons>
+        </view>
+        <scroll-view class="detail-body" scroll-y>
+          <view class="detail-section">
+            <view class="detail-field" v-if="detailData.image_url && detailData.image_url.length">
+              <text class="detail-label">设备照片</text>
+              <view class="detail-photos">
+                <image v-for="(url, i) in detailData.image_url" :key="i" class="detail-photo" :src="url" mode="aspectFill" @click="previewImage(detailData.image_url, i)" />
+              </view>
+            </view>
+            <view class="detail-field">
+              <text class="detail-label">设备编号</text>
+              <text class="detail-value">{{ detailData.code }}</text>
+            </view>
+            <view class="detail-field">
+              <text class="detail-label">设备名称</text>
+              <text class="detail-value">{{ detailData.name }}</text>
+            </view>
+            <view class="detail-field" v-if="detailData.short_name">
+              <text class="detail-label">设备简称</text>
+              <text class="detail-value">{{ detailData.short_name }}</text>
+            </view>
+            <view class="detail-field">
+              <text class="detail-label">品牌</text>
+              <text class="detail-value">{{ detailData.brand || '-' }}</text>
+            </view>
+            <view class="detail-field">
+              <text class="detail-label">规格型号</text>
+              <text class="detail-value">{{ detailData.model || '-' }}</text>
+            </view>
+            <view class="detail-field" v-if="detailData.manufacturer">
+              <text class="detail-label">生产厂家</text>
+              <text class="detail-value">{{ detailData.manufacturer }}</text>
+            </view>
+            <view class="detail-field" v-if="detailData.serial_no">
+              <text class="detail-label">产品编号</text>
+              <text class="detail-value">{{ detailData.serial_no }}</text>
+            </view>
+            <view class="detail-field">
+              <text class="detail-label">使用部门</text>
+              <text class="detail-value">{{ detailData.dept_id_text || '-' }}</text>
+            </view>
+            <view class="detail-field" v-if="detailData.location_id_text">
+              <text class="detail-label">存放位置</text>
+              <text class="detail-value">{{ detailData.location_id_text }}</text>
+            </view>
+            <view class="detail-field" v-if="detailData.person_in_charge">
+              <text class="detail-label">设备负责人</text>
+              <text class="detail-value">{{ detailData.person_in_charge }}</text>
+            </view>
+            <view class="detail-field">
+              <text class="detail-label">设备管理类型</text>
+              <uni-tag :text="getManagementTypeText(detailData.management_type)" :type="getManagementTypeType(detailData.management_type)" size="small" />
+            </view>
+            <view class="detail-field">
+              <text class="detail-label">状态</text>
+              <uni-tag :text="getStatusText(detailData.status)" :type="getStatusType(detailData.status)" size="small" />
+            </view>
+            <view class="detail-field" v-if="detailData.applicable_scope">
+              <text class="detail-label">适用范围</text>
+              <text class="detail-value">{{ detailData.applicable_scope }}</text>
+            </view>
+            <view class="detail-field" v-if="detailData.manufacture_date">
+              <text class="detail-label">生产日期</text>
+              <text class="detail-value">{{ formatDate(detailData.manufacture_date) }}</text>
+            </view>
+            <view class="detail-field" v-if="detailData.service_life">
+              <text class="detail-label">使用年限</text>
+              <text class="detail-value">{{ detailData.service_life }}年</text>
+            </view>
+            <view class="detail-field" v-if="detailData.acceptance_date">
+              <text class="detail-label">验收日期</text>
+              <text class="detail-value">{{ formatDate(detailData.acceptance_date) }}</text>
+            </view>
+            <view class="detail-field" v-if="detailData.warranty_years">
+              <text class="detail-label">保修年限</text>
+              <text class="detail-value">{{ detailData.warranty_years }}年</text>
+            </view>
+            <view class="detail-field" v-if="detailData.purchase_date">
+              <text class="detail-label">采购日期</text>
+              <text class="detail-value">{{ formatDate(detailData.purchase_date) }}</text>
+            </view>
+            <view class="detail-field" v-if="detailData.purchase_amount">
+              <text class="detail-label">采购金额</text>
+              <text class="detail-value">{{ detailData.purchase_amount }}</text>
+            </view>
+            <view class="detail-field" v-if="detailData.supplier">
+              <text class="detail-label">供应商</text>
+              <text class="detail-value">{{ detailData.supplier }}</text>
+            </view>
+            <view class="detail-field" v-if="detailData.warranty_end">
+              <text class="detail-label">保修截止</text>
+              <text class="detail-value">{{ formatDate(detailData.warranty_end) }}</text>
+            </view>
+            <view class="detail-field" v-if="detailData.remark">
+              <text class="detail-label">备注</text>
+              <text class="detail-value">{{ detailData.remark }}</text>
+            </view>
+          </view>
+        </scroll-view>
+      </view>
+    </uni-popup>
   </view>
 </template>
 
@@ -158,7 +269,8 @@ export default {
           '备注': 'remark'
         }
       },
-      exportExcelData: []
+      exportExcelData: [],
+      detailData: null
     }
   },
   onReady() {
@@ -337,6 +449,49 @@ export default {
           }
         }
       })
+    },
+    getFirstImage(image_url) {
+      if (Array.isArray(image_url) && image_url.length) {
+        return image_url[0]
+      }
+      return ''
+    },
+    previewImage(image_url, index) {
+      if (Array.isArray(image_url) && image_url.length) {
+        uni.previewImage({
+          urls: image_url,
+          current: index || 0
+        })
+      }
+    },
+    async showDetail(id) {
+      uni.showLoading({ mask: true })
+      try {
+        const res = await db.collection(dbCollectionName).doc(id).get()
+        const data = res.result.data[0]
+        if (data) {
+          if (data.image_url && typeof data.image_url === 'string') {
+            data.image_url = data.image_url ? [data.image_url] : []
+          }
+          if (data.dept_id) {
+            const deptRes = await db.collection('opendb-department').doc(data.dept_id).get()
+            data.dept_id_text = deptRes.result.data[0]?.name || ''
+          }
+          if (data.location_id) {
+            const locRes = await db.collection('medical-device-location').doc(data.location_id).get()
+            data.location_id_text = locRes.result.data[0]?.name || ''
+          }
+          this.detailData = data
+          this.$refs.detailPopup.open()
+        }
+      } catch (err) {
+        uni.showModal({ content: err.message || '获取详情失败', showCancel: false })
+      } finally {
+        uni.hideLoading()
+      }
+    },
+    closeDetail() {
+      this.$refs.detailPopup.close()
     }
   }
 }
@@ -615,5 +770,110 @@ $bg-hover: #f8fafc;
   justify-content: center;
   padding: 16px 24px;
   border-top: 1px solid $border;
+}
+
+.photo-cell {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.photo-thumb {
+  width: 56px;
+  height: 56px;
+  border-radius: 6px;
+  cursor: pointer;
+  object-fit: cover;
+  border: 1px solid $border;
+  transition: transform 0.15s ease;
+
+  &:hover {
+    transform: scale(1.1);
+  }
+}
+
+.btn-action-view {
+  background: $success-light;
+  border: none;
+  color: $success;
+
+  &:hover {
+    background: darken($success-light, 5%);
+    transform: translateY(-1px);
+  }
+}
+
+.detail-popup {
+  width: 520px;
+  max-height: 80vh;
+  background: #fff;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.detail-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 24px 16px;
+  border-bottom: 1px solid $border;
+}
+
+.detail-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: $text;
+}
+
+.detail-body {
+  padding: 16px 24px 24px;
+  max-height: 60vh;
+}
+
+.detail-section {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.detail-field {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.detail-label {
+  min-width: 80px;
+  font-size: 13px;
+  color: $text-secondary;
+  flex-shrink: 0;
+  line-height: 1.6;
+}
+
+.detail-value {
+  font-size: 13px;
+  color: $text;
+  line-height: 1.6;
+  word-break: break-all;
+}
+
+.detail-photos {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.detail-photo {
+  width: 80px;
+  height: 80px;
+  border-radius: 6px;
+  cursor: pointer;
+  object-fit: cover;
+  border: 1px solid $border;
+  transition: transform 0.15s ease;
+
+  &:hover {
+    transform: scale(1.05);
+  }
 }
 </style>

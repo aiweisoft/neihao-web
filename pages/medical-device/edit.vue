@@ -261,8 +261,10 @@ export default {
         const data = res.result.data[0]
         if (data) {
           this.formData = data
-          if (typeof this.formData.image_url === 'string') {
-            this.formData.image_url = this.formData.image_url ? [this.formData.image_url] : []
+          if (Array.isArray(this.formData.image_url)) {
+            this.formData.image_url = this.formData.image_url.map(url => ({ url }))
+          } else if (typeof this.formData.image_url === 'string') {
+            this.formData.image_url = this.formData.image_url ? [{ url: this.formData.image_url }] : []
           }
           if (this.formData.acceptance_date) {
             this.formData.acceptance_date = new Date(this.formData.acceptance_date).getTime()
