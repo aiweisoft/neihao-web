@@ -46,30 +46,6 @@
                 <uni-data-select v-model="formData.urgency" :localdata="urgencyOptions" placeholder="请选择紧急程度" />
               </uni-forms-item>
             </view>
-            <view class="form-col">
-              <uni-forms-item label="处理状态" name="status">
-                <uni-data-select v-model="formData.status" :localdata="statusOptions" placeholder="请选择处理状态" />
-              </uni-forms-item>
-            </view>
-          </view>
-          <view class="form-row">
-            <view class="form-col">
-              <uni-forms-item label="处理人" name="handler">
-                <uni-easyinput v-model="formData.handler" placeholder="请输入处理人" trim="both" />
-              </uni-forms-item>
-            </view>
-            <view class="form-col">
-              <uni-forms-item label="处理时间" name="handle_date">
-                <uni-datetime-picker v-model="formData.handle_date" return-type="timestamp" placeholder="请选择处理时间" />
-              </uni-forms-item>
-            </view>
-          </view>
-          <view class="form-row">
-            <view class="form-col">
-              <uni-forms-item label="处理结果" name="handle_result">
-                <uni-easyinput v-model="formData.handle_result" type="textarea" placeholder="请输入处理结果" trim="both" />
-              </uni-forms-item>
-            </view>
           </view>
           <view class="form-row">
             <view class="form-col">

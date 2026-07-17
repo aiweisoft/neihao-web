@@ -42,7 +42,7 @@
               </uni-td>
               <uni-td align="center">
                 <view class="action-group">
-                  <button @click="navigateTo('./edit?id=' + item._id, false)" class="btn-action btn-action-edit" size="mini">编辑</button>
+                  <button v-if="!hasRepairIds[item._id]" @click="navigateTo('./edit?id=' + item._id, false)" class="btn-action btn-action-edit" size="mini">编辑</button>
                   <button @click="confirmDelete(item._id)" class="btn-action btn-action-delete" size="mini">删除</button>
                 </view>
               </uni-td>
@@ -70,7 +70,8 @@ export default {
       orderby: 'request_date desc',
       selectedIndexs: [],
       pageSize: 20,
-      tableData: []
+      tableData: [],
+      hasRepairIds: {}
     }
   },
   onReady() {
@@ -80,11 +81,15 @@ export default {
     async onqueryload(data) {
       this.selectedIndexs = []
       const deviceIds = [...new Set(data.map(i => i.device_id).filter(Boolean))]
+      const requestIds = data.map(i => i._id)
+      const [deviceRes, repairRes] = await Promise.all([
+        deviceIds.length ? db.collection('medical-device').where({ _id: dbCmd.in(deviceIds) }).get() : Promise.resolve({ result: { data: [] } }),
+        requestIds.length ? db.collection('medical-device-repair').where({ repair_request_id: dbCmd.in(requestIds), deleted: 0 }).get() : Promise.resolve({ result: { data: [] } })
+      ])
       const deviceMap = {}
-      if (deviceIds.length) {
-        const deviceRes = await db.collection('medical-device').where({ _id: dbCmd.in(deviceIds) }).get()
-        deviceRes.result.data.forEach(d => { deviceMap[d._id] = d.name })
-      }
+      deviceRes.result.data.forEach(d => { deviceMap[d._id] = d.name })
+      this.hasRepairIds = {}
+      repairRes.result.data.forEach(r => { this.hasRepairIds[r.repair_request_id] = true })
       this.tableData = data.map(item => ({
         ...item,
         device_id_text: deviceMap[item.device_id] || '-',
