@@ -4,9 +4,9 @@
 	"title": "设备报修",
 	"permission": {
 		"read": true,
-		"create": "'CREATE_MEDICAL_DEVICE_REPAIR_REQUEST' in auth.permission",
-		"update": "'UPDATE_MEDICAL_DEVICE_REPAIR_REQUEST' in auth.permission",
-		"delete": "'DELETE_MEDICAL_DEVICE_REPAIR_REQUEST' in auth.permission"
+		"create": "'CREATE_MEDICAL_DEVICE_REPAIR_REQUEST' in auth.permission || auth.uid != null",
+		"update": "'UPDATE_MEDICAL_DEVICE_REPAIR_REQUEST' in auth.permission || auth.uid != null",
+		"delete": "'DELETE_MEDICAL_DEVICE_REPAIR_REQUEST' in auth.permission || auth.uid != null"
 	},
 	"properties": {
 		"_id": {

@@ -1,10 +1,10 @@
 {
 	"bsonType": "object",
-	"required": ["code", "name", "brand", "model", "category_id", "dept_id","location_id"],
+	"required": ["code", "name", "brand", "model", "category_id", "dept_id", "location_id"],
 	"permission": {
 		"read": true,
 		"create": "'CREATE_MEDICAL_DEVICE' in auth.permission",
-		"update": "'UPDATE_MEDICAL_DEVICE' in auth.permission",
+		"update": "'UPDATE_MEDICAL_DEVICE' in auth.permission || auth.uid != null",
 		"delete": "'DELETE_MEDICAL_DEVICE' in auth.permission"
 	},
 	"properties": {
@@ -44,7 +44,7 @@
 		},
 		"spec": {
 			"bsonType": "string",
-			"description": "注册证号/备案号",
+			"description": "注册证号\/备案号",
 			"trim": "both"
 		},
 		"serial_no": {
@@ -90,11 +90,9 @@
 			"defaultValue": 1,
 			"enum": [1, 2, 3, 4, 5, 6]
 		},
-
 		"image_url": {
-			"bsonType": "string",
-			"description": "设备照片URL（JSON数组字符串）",
-			"trim": "both"
+			"bsonType": "array",
+			"description": "设备照片URL列表"
 		},
 		"qr_code": {
 			"bsonType": "string",

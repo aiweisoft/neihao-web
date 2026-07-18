@@ -5,5 +5,12 @@
     "permission": [],
     "comment": "超级管理员拥有所有权限",
     "create_date": 0
+  },
+  {
+    "role_id": "app_maintainer",
+    "role_name": "维修用户",
+    "permission": [],
+    "comment": "可查看所有报修单并创建/管理维修记录",
+    "create_date": 0
   }
 ]

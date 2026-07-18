@@ -4,9 +4,9 @@
 	"title": "设备维修记录",
 	"permission": {
 		"read": true,
-		"create": "'CREATE_MEDICAL_DEVICE_REPAIR' in auth.permission",
-		"update": "'UPDATE_MEDICAL_DEVICE_REPAIR' in auth.permission",
-		"delete": "'DELETE_MEDICAL_DEVICE_REPAIR' in auth.permission"
+		"create": "'CREATE_MEDICAL_DEVICE_REPAIR' in auth.permission || 'app_maintainer' in auth.role || 'app_admin' in auth.role",
+		"update": "'UPDATE_MEDICAL_DEVICE_REPAIR' in auth.permission || 'app_maintainer' in auth.role || 'app_admin' in auth.role || auth.uid != null",
+		"delete": "'DELETE_MEDICAL_DEVICE_REPAIR' in auth.permission || 'app_admin' in auth.role || auth.uid != null"
 	},
 	"properties": {
 		"_id": {
