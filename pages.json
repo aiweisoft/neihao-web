@@ -328,14 +328,24 @@
     "enablePullDownRefresh": false
   }
 },
-{
-  "path": "pages/medical-device-alert/edit",
-  "style": {
-    "navigationBarTitleText": "编辑报警提醒",
-    "enablePullDownRefresh": false
-  }
-}
-],
+		{
+			"path": "pages/medical-device-alert/edit",
+			"style": {
+				"navigationBarTitleText": "编辑报警提醒",
+				"enablePullDownRefresh": false
+			}
+		},
+		{
+			"path": "pages/medical-device-dashboard/index",
+			"style": {
+				"topWindow": false,
+				"leftWindow": false,
+				"navigationBarTitleText": "设备3D监控",
+				"navigationStyle": "custom",
+				"enablePullDownRefresh": false
+			}
+		}
+	],
 	"subPackages": [{
 			"root": "pages/system",
 			"pages": [{

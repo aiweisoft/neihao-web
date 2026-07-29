@@ -225,7 +225,7 @@ export default {
       timer: null,
       statCards: [
         { key: 'device', label: '设备总数', field: 'totalDevices', icon: 'admin-icons-shebeitongji', url: '/pages/medical-device/list' },
-        { key: 'category', label: '设备分类', field: 'totalCategories', icon: 'admin-icons-manager-tag', url: '/pages/medical-device-category/list' },
+        { key: 'inuse', label: '使用中设备', field: 'totalInUse', icon: 'admin-icons-activity', url: '/pages/medical-device/list?status=2' },
         { key: 'location', label: '存放位置', field: 'totalLocations', icon: 'admin-icons-ziyuan', url: '/pages/medical-device-location/list' },
         { key: 'dept', label: '使用部门', field: 'totalDepartments', icon: 'admin-icons-manager-user', url: '/pages/opendb-department/list' },
         { key: 'alert', label: '待处理提醒', field: 'totalAlerts', icon: 'admin-icons-safety', url: '/pages/medical-device-alert/list' }
@@ -234,7 +234,7 @@ export default {
       avatarColors: ['#6366f1', '#f5576c', '#4facfe', '#43e97b', '#f093fb', '#f59e0b', '#ed4014', '#2d8cf0', '#10b981', '#667eea'],
       stats: {
         totalDevices: 0,
-        totalCategories: 0,
+        totalInUse: 0,
         totalLocations: 0,
         totalDepartments: 0,
         totalAlerts: 0
@@ -305,6 +305,7 @@ export default {
         { key: 'other', label: '其他', count: 0 }
       ],
       quickActions: [
+        { key: 'dashboard', label: '3D监控大屏', icon: 'admin-icons-activity', url: '/pages/medical-device-dashboard/index', color: 'orange' },
         { key: 'add', label: '新增设备', icon: 'admin-icons-add', url: '/pages/medical-device/add', color: 'purple' },
         { key: 'category', label: '设备分类', icon: 'admin-icons-manager-tag', url: '/pages/medical-device-category/list', color: 'pink' },
         { key: 'location', label: '存放位置', icon: 'admin-icons-ziyuan', url: '/pages/medical-device-location/list', color: 'blue' },
@@ -321,6 +322,7 @@ export default {
   onShow() {
     this.loadStatusSummary()
     this.loadDeviceCount()
+    this.loadInUseCount()
     this.loadAlertCount()
     this.loadAlertList()
   },
@@ -354,7 +356,7 @@ export default {
       try {
         await Promise.all([
           this.loadDeviceCount(),
-          this.loadCategoryCount(),
+          this.loadInUseCount(),
           this.loadLocationCount(),
           this.loadDeptCount(),
           this.loadRecentDevices(),
@@ -373,9 +375,9 @@ export default {
       const res = await db.collection('medical-device').where({ deleted: 0 }).count()
       this.stats.totalDevices = res.result.total || 0
     },
-    async loadCategoryCount() {
-      const res = await db.collection('medical-device-category').where({ deleted: 0 }).count()
-      this.stats.totalCategories = res.result.total || 0
+    async loadInUseCount() {
+      const res = await db.collection('medical-device').where({ deleted: 0, status: 2 }).count()
+      this.stats.totalInUse = res.result.total || 0
     },
     async loadLocationCount() {
       const res = await db.collection('medical-device-location').where({ deleted: 0 }).count()
@@ -691,8 +693,8 @@ export default {
   background: radial-gradient(circle, #6366f1 0%, transparent 70%);
 }
 
-.stat-bg-category {
-  background: radial-gradient(circle, #ec4899 0%, transparent 70%);
+.stat-bg-inuse {
+  background: radial-gradient(circle, #f59e0b 0%, transparent 70%);
 }
 
 .stat-bg-location {
@@ -732,9 +734,9 @@ export default {
   box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
 }
 
-.stat-icon-category {
-  background: linear-gradient(135deg, #ec4899, #f472b6);
-  box-shadow: 0 4px 12px rgba(236, 72, 153, 0.3);
+.stat-icon-inuse {
+  background: linear-gradient(135deg, #f59e0b, #fbbf24);
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
 }
 
 .stat-icon-location {
@@ -951,6 +953,7 @@ export default {
   .quick-icon-pink { background: linear-gradient(135deg, #ec4899, #f472b6); box-shadow: 0 3px 10px rgba(236, 72, 153, 0.25); }
   .quick-icon-blue { background: linear-gradient(135deg, #0ea5e9, #38bdf8); box-shadow: 0 3px 10px rgba(14, 165, 233, 0.25); }
   .quick-icon-green { background: linear-gradient(135deg, #10b981, #34d399); box-shadow: 0 3px 10px rgba(16, 185, 129, 0.25); }
+  .quick-icon-orange { background: linear-gradient(135deg, #f97316, #fb923c); box-shadow: 0 3px 10px rgba(249, 115, 22, 0.25); }
 
   .quick-label {
     font-size: 12px;

@@ -40,6 +40,11 @@ export default {
 	},
 	sideBar: {
 		staticMenu: [{
+			menu_id: "dashboard-3d",
+			text: '3D 可视化大屏',
+			icon: 'admin-icons-shebeitongji',
+			value: '/pages/medical-device-dashboard/index',
+		}, {
 			menu_id: "basic-data",
 			text: '基础数据',
 			icon: 'admin-icons-manager-tag',
