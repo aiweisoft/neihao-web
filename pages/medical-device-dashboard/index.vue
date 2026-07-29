@@ -192,7 +192,7 @@ const db = uniCloud.database()
 const FLOOR_NAMES = ['一层', '二层', '三层', '四层', '五层']
 const FLOOR_LABELS = ['1F', '2F', '3F', '4F', '5F']
 const FLOOR_COLORS = ['#3B82F6', '#8B5CF6', '#06B6D4', '#F59E0B', '#EC4899']
-const STATUS_COLORS = { online: '#22C55E', alarm: '#EF4444', maintenance: '#F59E0B', offline: '#6B7280' }
+const STATUS_COLORS = { online: '#22C55E', alarm: '#EF4444', maintenance: '#EF4444', offline: '#6B7280' }
 
 const EQUIP_TYPES_3D = {
   'CT Scanner': { shape: 'box', w: 0.8, h: 0.7, d: 0.6, color: '#4B89DC' },
@@ -434,7 +434,7 @@ export default {
         return { visualStatus: 'primary', statusColor: '#3B82F6', type3D: this.inferType3D(device), dbStatus: s }
       }
       if (s === 3) {
-        return { visualStatus: 'repair', statusColor: '#F59E0B', type3D: this.inferType3D(device), dbStatus: s }
+        return { visualStatus: 'repair', statusColor: '#EF4444', type3D: this.inferType3D(device), dbStatus: s }
       }
       if (s === 4 || s === 5) {
         return { visualStatus: 'gray', statusColor: '#6B7280', type3D: this.inferType3D(device), dbStatus: s }
@@ -1145,32 +1145,31 @@ export default {
       div.style.border = '1px solid rgba(59,130,246,0.5)'
       div.style.borderRadius = '10px'
       div.style.padding = '0'
-      div.style.minWidth = '200px'
+      div.style.minWidth = '180px'
+      div.style.maxWidth = '220px'
       div.style.backdropFilter = 'blur(8px)'
       div.style.boxShadow = '0 8px 32px rgba(0,0,0,0.4)'
       div.style.overflow = 'hidden'
       div.style.display = 'flex'
-      div.style.alignItems = 'flex-start'
+      div.style.flexDirection = 'column'
 
       // Image thumbnail
       if (hasImage) {
         const imgWrap = document.createElement('div')
-        imgWrap.style.width = '60px'
-        imgWrap.style.height = '60px'
-        imgWrap.style.borderRadius = '0'
+        imgWrap.style.width = '100%'
+        imgWrap.style.height = '120px'
         imgWrap.style.background = '#0A0E17'
         imgWrap.style.display = 'flex'
         imgWrap.style.alignItems = 'center'
         imgWrap.style.justifyContent = 'center'
         imgWrap.style.overflow = 'hidden'
         imgWrap.style.cursor = 'pointer'
-        imgWrap.style.flexShrink = '0'
 
         const img = document.createElement('img')
         img.src = eq.image_url[0]
         img.style.width = '100%'
         img.style.height = '100%'
-        img.style.objectFit = 'cover'
+        img.style.objectFit = 'contain'
         img.style.pointerEvents = 'auto'
 
         imgWrap.addEventListener('click', (e) => {
@@ -1187,9 +1186,7 @@ export default {
       }
 
       const body = document.createElement('div')
-      body.style.padding = '10px 12px 10px ' + (hasImage ? '10px' : '12px')
-      body.style.flex = '1'
-      body.style.minWidth = '0'
+      body.style.padding = '10px 12px'
 
       // Header row: icon + name + status
       const header = document.createElement('div')
@@ -1234,9 +1231,9 @@ export default {
       } else if (statusClass === 'online') {
         statusBadge.style.background = 'rgba(34,197,94,0.2)'
         statusBadge.style.color = '#22C55E'
-      } else if (statusClass === 'maintenance') {
-        statusBadge.style.background = 'rgba(245,158,11,0.2)'
-        statusBadge.style.color = '#F59E0B'
+      } else if (statusClass === 'repair') {
+        statusBadge.style.background = 'rgba(239,68,68,0.2)'
+        statusBadge.style.color = '#EF4444'
       } else {
         statusBadge.style.background = 'rgba(107,114,128,0.2)'
         statusBadge.style.color = '#6B7280'
@@ -1440,11 +1437,11 @@ export default {
   --accent-hover: #60A5FA;
   --status-online: #22C55E;
   --status-alarm: #EF4444;
-  --status-maintenance: #F59E0B;
+  --status-maintenance: #EF4444;
   --status-offline: #6B7280;
   --status-online-bg: rgba(34,197,94,0.15);
   --status-alarm-bg: rgba(239,68,68,0.15);
-  --status-maintenance-bg: rgba(245,158,11,0.15);
+  --status-maintenance-bg: rgba(239,68,68,0.15);
   --status-offline-bg: rgba(107,114,128,0.15);
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
   background: var(--surface-primary);
